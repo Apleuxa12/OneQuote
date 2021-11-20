@@ -1,3 +1,3 @@
 package com.ddmukhin.onequote.persistence
 
-interface Database<T> : CrudInterface<T>
+interface Database : CrudInterface<DatabaseKey>
