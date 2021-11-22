@@ -11,10 +11,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.paperdb.BuildConfig
-import okhttp3.Cache
-import okhttp3.JavaNetCookieJar
+import okhttp3.*
 import okhttp3.OkHttp.VERSION
-import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -31,6 +29,7 @@ class RemoteModule {
         const val CONNECTION_TIMEOUT_SEC = 30L
 
         const val BASE_URL = ""
+        const val API_KEY = ""
     }
 
     @Provides
@@ -56,6 +55,8 @@ class RemoteModule {
                 })
             }
 
+
+
             connectTimeout(CONNECTION_TIMEOUT_SEC, TimeUnit.SECONDS)
             readTimeout(CONNECTION_TIMEOUT_SEC, TimeUnit.SECONDS)
             writeTimeout(CONNECTION_TIMEOUT_SEC, TimeUnit.SECONDS)
@@ -70,4 +71,12 @@ class RemoteModule {
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+
+    private fun Interceptor.Chain.addApiKey(apiKey: String): Response {
+        val original = request()
+        val url = original.url.newBuilder()
+            .addQueryParameter("api_key", apiKey)
+            .build()
+        return proceed(original.newBuilder().url(url).build())
+    }
 }
